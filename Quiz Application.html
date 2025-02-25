@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Application</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #121212;
+            color: white;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loading-screen {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: #1e1e1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 40px;
+            color: #00c8ff;
+            font-weight: bold;
+        }
+
+        .quiz-container, .result-container {
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            background: #222;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .option-button {
+            display: block;
+            width: 100%;
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .option-button:hover {
+            background: #005f99;
+            transform: scale(1.05);
+        }
+
+        #next {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: 0.3s;
+            display: none;
+        }
+
+        #next:hover {
+            background: #218838;
+            transform: scale(1.1);
+        }
+
+        #feedback {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #ffd700;
+        }
+
+        .result-container button {
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .retry { background: #ffcc00; }
+        .exit { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="loading-screen" id="loading-screen">
+        <h1>Get Ready for the Quiz! 🎯</h1>
+        <div id="countdown">3</div>
+    </div>
+
+    <div class="quiz-container" id="quiz-container">
+        <h2 id="question"></h2>
+        <div id="options"></div>
+        <h3 id="feedback"></h3>
+        <button id="next" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <div class="result-container" id="result-container">
+        <h2>Your Score: <span id="score"></span>/10</h2>
+        <button class="retry" onclick="restartQuiz()">🔄 Reattempt Quiz</button>
+        <button class="exit" onclick="closeQuiz()">❌ Close Quiz</button>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris", "Lisbon"], answer: "Paris" },
+            { question: "Which planet is known as the Red Planet?", options: ["Earth", "Mars", "Jupiter", "Venus"], answer: "Mars" },
+            { question: "What is the chemical symbol for water?", options: ["H2O", "O2", "CO2", "NaCl"], answer: "H2O" },
+            { question: "Who wrote 'To Kill a Mockingbird'?", options: ["Harper Lee", "J.K. Rowling", "Ernest Hemingway", "Mark Twain"], answer: "Harper Lee" },
+            { question: "What is the speed of light?", options: ["300,000 km/s", "150,000 km/s", "1,000 km/s", "30,000 km/s"], answer: "300,000 km/s" },
+            { question: "What is the powerhouse of the cell?", options: ["Nucleus", "Ribosome", "Mitochondria", "Golgi Apparatus"], answer: "Mitochondria" },
+            { question: "Who painted the Mona Lisa?", options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Claude Monet"], answer: "Leonardo da Vinci" },
+            { question: "What is the largest ocean on Earth?", options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"], answer: "Pacific Ocean" },
+            { question: "What is the currency of Japan?", options: ["Yuan", "Won", "Yen", "Ringgit"], answer: "Yen" },
+            { question: "Which gas do plants use for photosynthesis?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], answer: "Carbon Dioxide" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("next").style.display = "none";
+
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById("question").innerText = currentQuestion.question;
+            document.getElementById("options").innerHTML = "";
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement("button");
+                button.innerText = option;
+                button.classList.add("option-button");
+                button.onclick = () => checkAnswer(option, button);
+                document.getElementById("options").appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedOption, button) {
+            const correctAnswer = questions[currentQuestionIndex].answer;
+            document.querySelectorAll(".option-button").forEach(btn => btn.disabled = true);
+
+            if (selectedOption === correctAnswer) {
+                button.style.backgroundColor = "#28a745";
+                score++;
+                document.getElementById("feedback").innerText = "🎉 Correct!";
+            } else {
+                button.style.backgroundColor = "#dc3545";
+                document.getElementById("feedback").innerText = "❌ Incorrect!";
+            }
+
+            document.getElementById("next").style.display = "block";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                document.getElementById("quiz-container").style.display = "none";
+                document.getElementById("result-container").style.display = "block";
+                document.getElementById("score").innerText = score;
+            }
+        }
+
+        function restartQuiz() {
+            location.reload();
+        }
+
+        function closeQuiz() {
+            window.close();
+        }
+
+        let countdown = 3;
+        let interval = setInterval(() => {
+            document.getElementById("countdown").innerText = countdown--;
+            if (countdown < 0) {
+                clearInterval(interval);
+                document.getElementById("loading-screen").style.display = "none";
+                document.getElementById("quiz-container").style.display = "block";
+                loadQuestion();
+            }
+        }, 1000);
+    </script>
+
+</body>
+</html>
