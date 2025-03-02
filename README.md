@@ -102,6 +102,8 @@ Implements logic for displaying questions, checking answers, and updating the UI
 
 Manages quiz progression and displays results at the end.
 
+#OUTPUT
+
 ![Image](https://github.com/user-attachments/assets/88e0bb4e-05d9-4d59-bead-1772f71e0907)
 
 ![Image](https://github.com/user-attachments/assets/d668609e-f704-4ef5-9752-dfc341b8117a)
